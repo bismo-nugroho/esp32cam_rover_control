@@ -149,6 +149,15 @@ httpd_handle_t camera_httpd = NULL;
 httpd_handle_t stream_httpd = NULL;
 
 static const char PROGMEM INDEX_HTML[] = R"rawliteral(
+
+
+
+
+
+
+
+
+
 <html>
   <head>
     <title>ESP32-CAM Robot</title>
@@ -213,12 +222,18 @@ static const char PROGMEM INDEX_HTML[] = R"rawliteral(
     </style>
   </head>
   <body>
-    <h1>ESP32-CAM Pan and Tilt</h1>
-    <img src="" id="photo" >
+    <h3>Camera</h1>
+    <img src="" id="photo" style="width:640px;height:480px" >
 
     <!-- Example of FIXED or ABSOLUTE position -->
-    <div id="joy3Div" style="width:200px;height:200px;margin:50px;position:fixed;bottom:30px;left:500px;"></div>
-    <div style="position:fixed;bottom:125px;left:750px;">
+<div style="width: 200px; height: 200px; margin: 30px; position: fixed; top: 40px; right: 1px; touch-action: none;">
+ <div style="
+    right: auto;
+"> Rover Control  
+ </div>
+    <div id="joy3Div" style="width:200px;height:200px;margin:30px;position:fixed;top:40px;right:1px;"></div>
+</div>
+    <div style="position:fixed;bottom:10px;right:1px;">
       Posizione X:<input id="joy3PosizioneX" type="text" /><br />
       Posizione Y:<input id="joy3PosizioneY" type="text" /><br />
       Direzione:<input id="joy3Direzione" type="text" /><br />
@@ -268,34 +283,48 @@ setInterval(function(){
 
      var servo1x = 0;
      var servo2x = 0;    
+     var step = 3;
+     var mult = 1; 
+
      
-     if (Joy3.GetX() ==0 ){
+       
+      if (Joy3.GetY() < 0 ) mult = -1
+      else
+       mult = 1;
+
+     // Axiss Y
+     if (Joy3.GetY() == 0  ){
 
      }else{
-      servo1 = parseInt(Joy3.GetY() / 20);
-      servo2 = parseInt(Joy3.GetY() * -1 / 20);
 
-      remy = Joy3.GetY() % 20;
-      if (remy > 0){
-        servo1 = servo1 + 1 ;
-        servo2 = servo2 + 1 ;
-     }
+      servo1 = parseInt(Math.abs(Joy3.GetY()) / 20);
+      servo2 = parseInt(Math.abs(Joy3.GetY()) / 20) ;
+
+
+      remy = Math.abs(Joy3.GetY()) % 20;
+      if (remy > 0 ){
+        servo1 = servo1 + 1;
+        servo2 = servo2 + 1;
      }
 
+     }
+
+
+      // Axiss X
       if (Joy3.GetX() ==0 ){
 
      }else{
 
-            remy = Joy3.GetX() % 20;
+      remy = Math.abs(Joy3.GetX()) % 20;
 
-      if (Joy3.GetX() > 5){
-      //servo1x = parseInt(Joy3.GetX() / 20);
-        servo2x = parseInt(Joy3.GetX() / 20);
+      if (Joy3.GetX() > 5 ){
+      //servo1x = Math.abs(parseInt(Joy3.GetX()) / 20);
+        servo2x = Math.abs(parseInt(Joy3.GetX()) / 20);
         if (remy > 0){
           servo2x = servo2x + 1 ;
         }
 
-         servo2x = servo2x / 5 * (servo2 * 5);
+         servo2x = servo2x / 5 * (servo2 * step);
         }
         else if (Joy3.GetX() < -5){
       //servo1x = parseInt(Joy3.GetX() / 20);
@@ -304,15 +333,15 @@ setInterval(function(){
           servo1x = servo2x + 1 ;
         }
 
-         servo1x = servo1x / 5 * (servo1 * 5);
+         servo1x = servo1x / 5 * (servo1 * step);
         }
 
         
       }
 
 
-     servo1 = 90 + ( ( servo1 * 5) - servo1x );
-     servo2 = 90 - ( ( servo2 * 5) - servo2x ) ;
+     servo1 = 90 + ( ( servo1 * step) /* - servo1x */   * mult);
+     servo2 = 90 + ( ( servo2 * step)  /* - servo2x */  ) * ( mult / -1);
 
      
      if (lservo1 != servo1 || lservo2 != servo2) {
@@ -331,6 +360,9 @@ setInterval(function(){
   </script>
   </body>
 </html>
+
+
+
 )rawliteral";
 
 static esp_err_t index_handler(httpd_req_t *req){
