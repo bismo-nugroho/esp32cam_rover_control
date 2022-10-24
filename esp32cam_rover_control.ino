@@ -271,14 +271,15 @@ setInterval(function(){
      var servo1 = 0;
      var servo2 = 0;
 
+     var servox1 = 0;
+     var servox2 = 0;
+
      var servo1x = 0;
      var servo2x = 0;    
      var step = 3;
      var mult1 = 1; 
      var mult2 = 1;
 
-     
-       
       if (Joy3.GetY() < 0 ){ 
         mult1 = -1
         mult2 = -1;
@@ -319,12 +320,13 @@ setInterval(function(){
         if (remy > 0){
           servo2x = servo2x;
         }
+
          if (servo2 ==0 ){
            servo1x = ( servo2x * step ) * -1;
            servo2x = servo1x;
            mult2 = mult1 * -1;
          }else{
-           servo2x = parseInt(servo2x / 5 * (servo2 * step));
+           servo2x = parseInt(servo2x / 4 * (servo2 * step));
          }
 
         }
@@ -341,25 +343,26 @@ setInterval(function(){
            servo1x = servo2x;
            mult1 =  -1;
          }else{
-           servo1x = parseInt(servo1x / 5 * (servo1 * step));
+           servo1x = parseInt(servo1x / 4 * (servo1 * step));
          }
+         
         }
 
         
       }
 
 
-     servo1 = 90 + ( ( servo1 * step)   -  servo1x   )      * mult1  ;
-     servo2 = 90 + ( ( servo2 * step)  - servo2x  )   * ( mult2 / -1) ;
+     servox1 = 90 + ( ( servo1 * step)   -  servo1x   )      * mult1  ;
+     servox2 = 90 + ( ( servo2 * step)  - servo2x  )   * ( mult2 / -1) ;
 
      
-     if (lservo1 != servo1 || lservo2 != servo2) {
-     xhr.open("GET", "/action?pos1=" + servo1+"&pos2="+servo2, true);
+     if (lservo1 != servox1 || lservo2 != servox2) {
+     xhr.open("GET", "/action?pos1=" + servox1+"&pos2="+servox2, true);
      xhr.send();
      
 
-      lservo1 = servo1;
-      lservo2 = servo2;
+      lservo1 = servox1;
+      lservo2 = servox2;
      }
 
       
@@ -369,6 +372,7 @@ setInterval(function(){
   </script>
   </body>
 </html>
+
 
 )rawliteral";
 
