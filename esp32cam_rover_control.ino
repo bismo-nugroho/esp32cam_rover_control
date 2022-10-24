@@ -154,10 +154,6 @@ static const char PROGMEM INDEX_HTML[] = R"rawliteral(
 
 
 
-
-
-
-
 <html>
   <head>
     <title>ESP32-CAM Robot</title>
@@ -293,7 +289,7 @@ setInterval(function(){
        mult = 1;
 
      // Axiss Y
-     if (Joy3.GetY() == 0  ){
+     if (Math.abs(Joy3.GetY()) <= 20  ){
 
      }else{
 
@@ -303,8 +299,8 @@ setInterval(function(){
 
       remy = Math.abs(Joy3.GetY()) % 20;
       if (remy > 0 ){
-        servo1 = servo1 + 1;
-        servo2 = servo2 + 1;
+        servo1 = servo1;
+        servo2 = servo2;
      }
 
      }
@@ -360,6 +356,8 @@ setInterval(function(){
   </script>
   </body>
 </html>
+
+
 
 
 
