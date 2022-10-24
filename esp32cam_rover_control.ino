@@ -150,6 +150,7 @@ httpd_handle_t stream_httpd = NULL;
 
 static const char PROGMEM INDEX_HTML[] = R"rawliteral(
 
+
 <html>
   <head>
     <title>ESP32-CAM Robot</title>
@@ -190,12 +191,28 @@ static const char PROGMEM INDEX_HTML[] = R"rawliteral(
   width: 15%;
   min-width: 300px;
 }
+
+
 .columnCetral
 {
   float: left;
   width: 70%;
   min-width: 300px;
 }
+
+@media screen and (min-width: 320px) and (max-width: 767px) and (orientation: portrait) {
+  html {
+    transform: rotate(-90deg);
+    transform-origin: left top;
+    width: 100vh;
+    height: 100vw;
+    overflow-x: hidden;
+    position: absolute;
+    top: 100%;
+    left: 0;
+  }
+}
+
 #joy2Div
 {
   width:200px;
@@ -280,6 +297,8 @@ setInterval(function(){
      var mult1 = 1; 
      var mult2 = 1;
 
+     
+       
       if (Joy3.GetY() < 0 ){ 
         mult1 = -1
         mult2 = -1;
@@ -345,7 +364,6 @@ setInterval(function(){
          }else{
            servo1x = parseInt(servo1x / 4 * (servo1 * step));
          }
-         
         }
 
         
