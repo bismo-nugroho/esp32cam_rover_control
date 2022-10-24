@@ -150,10 +150,6 @@ httpd_handle_t stream_httpd = NULL;
 
 static const char PROGMEM INDEX_HTML[] = R"rawliteral(
 
-
-
-
-
 <html>
   <head>
     <title>ESP32-CAM Robot</title>
@@ -188,7 +184,6 @@ static const char PROGMEM INDEX_HTML[] = R"rawliteral(
         max-width: 100% ;
         height: auto ; 
       }
-
       .columnLateral
 {
   float: left;
@@ -220,7 +215,6 @@ static const char PROGMEM INDEX_HTML[] = R"rawliteral(
   <body>
     <h3>Camera</h1>
     <img src="" id="photo" style="width:640px;height:480px" >
-
     <!-- Example of FIXED or ABSOLUTE position -->
 <div style="width: 200px; height: 200px; margin: 30px; position: fixed; top: 40px; right: 1px; touch-action: none;">
  <div style="
@@ -243,7 +237,7 @@ static const char PROGMEM INDEX_HTML[] = R"rawliteral(
       <tr><td colspan="3" align="center"><button class="button" onmousedown="toggleCheckbox('down');" ontouchstart="toggleCheckbox('down');">Backward</button></td></tr>                   
     </table>
    <script>
-   function toggleCheckbox(x) {
+    function toggleCheckbox(x) {
      var xhr = new XMLHttpRequest();
      xhr.open("GET", "/action?go=" + x, true);
      xhr.send();
@@ -280,13 +274,18 @@ setInterval(function(){
      var servo1x = 0;
      var servo2x = 0;    
      var step = 3;
-     var mult = 1; 
+     var mult1 = 1; 
+     var mult2 = 1;
 
      
        
-      if (Joy3.GetY() < 0 ) mult = -1
-      else
-       mult = 1;
+      if (Joy3.GetY() < 0 ){ 
+        mult1 = -1
+        mult2 = -1;
+      }else{
+        mult1 = 1;
+        mult2 = 1;
+      }
 
      // Axiss Y
      if (Math.abs(Joy3.GetY()) <= 20  ){
@@ -307,37 +306,51 @@ setInterval(function(){
 
 
       // Axiss X
-      if (Joy3.GetX() ==0 ){
+      if (Math.abs(Joy3.GetX()) <= 20 ){
 
      }else{
 
       remy = Math.abs(Joy3.GetX()) % 20;
 
-      if (Joy3.GetX() > 5 ){
-      //servo1x = Math.abs(parseInt(Joy3.GetX()) / 20);
-        servo2x = Math.abs(parseInt(Joy3.GetX()) / 20);
-        if (remy > 0){
-          servo2x = servo2x + 1 ;
-        }
+      if (Joy3.GetX() > 20 ){
+      //servo1x = Math.abs(parseInt(Joy3.GetX() / 20));
+        servo2x = Math.abs(parseInt(Joy3.GetX() / 20));
 
-         servo2x = servo2x / 5 * (servo2 * step);
+        if (remy > 0){
+          servo2x = servo2x;
         }
-        else if (Joy3.GetX() < -5){
+         if (servo2 ==0 ){
+           servo1x = ( servo2x * step ) * -1;
+           servo2x = servo1x;
+           mult2 = mult1 * -1;
+         }else{
+           servo2x = parseInt(servo2x / 5 * (servo2 * step));
+         }
+
+        }
+        else if (Joy3.GetX() < -20){
       //servo1x = parseInt(Joy3.GetX() / 20);
-        servo1x = parseInt(Joy3.GetX() * -1 / 20);
+        servo1x = Math.abs(parseInt(Joy3.GetX() / 20));
+
         if (remy > 0){
-          servo1x = servo2x + 1 ;
+          servo1x = servo1x ;
         }
 
-         servo1x = servo1x / 5 * (servo1 * step);
+         if (servo2 ==0 ){
+           servo2x = ( servo1x * step ) * -1;
+           servo1x = servo2x;
+           mult1 =  -1;
+         }else{
+           servo1x = parseInt(servo1x / 5 * (servo1 * step));
+         }
         }
 
         
       }
 
 
-     servo1 = 90 + ( ( servo1 * step) /* - servo1x */   * mult);
-     servo2 = 90 + ( ( servo2 * step)  /* - servo2x */  ) * ( mult / -1);
+     servo1 = 90 + ( ( servo1 * step)   -  servo1x   )      * mult1  ;
+     servo2 = 90 + ( ( servo2 * step)  - servo2x  )   * ( mult2 / -1) ;
 
      
      if (lservo1 != servo1 || lservo2 != servo2) {
@@ -356,10 +369,6 @@ setInterval(function(){
   </script>
   </body>
 </html>
-
-
-
-
 
 )rawliteral";
 
