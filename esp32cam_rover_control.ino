@@ -150,7 +150,6 @@ httpd_handle_t stream_httpd = NULL;
 
 static const char PROGMEM INDEX_HTML[] = R"rawliteral(
 
-
 <html>
   <head>
     <title>ESP32-CAM Robot</title>
@@ -191,15 +190,12 @@ static const char PROGMEM INDEX_HTML[] = R"rawliteral(
   width: 15%;
   min-width: 300px;
 }
-
-
 .columnCetral
 {
   float: left;
   width: 70%;
   min-width: 300px;
 }
-
 @media screen and (min-width: 320px) and (max-width: 767px) and (orientation: portrait) {
   html {
     transform: rotate(-90deg);
@@ -212,7 +208,6 @@ static const char PROGMEM INDEX_HTML[] = R"rawliteral(
     left: 0;
   }
 }
-
 #joy2Div
 {
   width:200px;
@@ -259,16 +254,29 @@ static const char PROGMEM INDEX_HTML[] = R"rawliteral(
      xhr.open("GET", "/action?go=" + x, true);
      xhr.send();
    }
+   
+   
+
+   
    window.onload = function(){
     
     document.getElementById("photo").src = window.location.href.slice(0, -1) + ":81/stream";
    
-
 var joy3Param = { "title": "joystick3" };
-var Joy3 = new JoyStick('joy3Div', joy3Param);
-
+//var Joy3 = new JoyStick('joy3Div', joy3Param);
 var lservo1 = 0;
 var lservo2 = 0;
+
+var Joy3 = new JoyStick('joy3Div', {}, function(stickData) {
+    joy3PosizioneX.value = stickData.xPosition;
+    joy3PosizioneX.value = stickData.yPosition;
+    joy3Direzione.value = stickData.cardinalDirection;
+    joy3X.value = stickData.x;
+    joy3Y.value = stickData.y;
+    
+    request_to_web(stickData);
+});
+
 
 var joy3IinputPosX = document.getElementById("joy3PosizioneX");
 var joy3InputPosY = document.getElementById("joy3PosizioneY");
@@ -276,27 +284,20 @@ var joy3Direzione = document.getElementById("joy3Direzione");
 var joy3X = document.getElementById("joy3X");
 var joy3Y = document.getElementById("joy3Y");
 
-setInterval(function(){ joy3IinputPosX.value=Joy3.GetPosX(); }, 50);
-setInterval(function(){ joy3InputPosY.value=Joy3.GetPosY(); }, 50);
-setInterval(function(){ joy3Direzione.value=Joy3.GetDir(); }, 50);
-setInterval(function(){ joy3X.value=Joy3.GetX(); }, 50);
-setInterval(function(){ joy3Y.value=Joy3.GetY(); }, 50);
 
-setInterval(function(){     
-  
-  var xhr = new XMLHttpRequest();
+
+
+   function request_to_web(stickData){
+   
      var servo1 = 0;
      var servo2 = 0;
-
      var servox1 = 0;
      var servox2 = 0;
-
      var servo1x = 0;
      var servo2x = 0;    
      var step = 3;
      var mult1 = 1; 
      var mult2 = 1;
-
      
        
       if (Joy3.GetY() < 0 ){ 
@@ -306,40 +307,27 @@ setInterval(function(){
         mult1 = 1;
         mult2 = 1;
       }
-
      // Axiss Y
-     if (Math.abs(Joy3.GetY()) <= 20  ){
-
+     if (Math.abs(stickData.y) <= 20  ){
      }else{
-
-      servo1 = parseInt(Math.abs(Joy3.GetY()) / 20);
-      servo2 = parseInt(Math.abs(Joy3.GetY()) / 20) ;
-
-
-      remy = Math.abs(Joy3.GetY()) % 20;
+      servo1 = parseInt(Math.abs(stickData.y) / 20);
+      servo2 = parseInt(Math.abs(stickData.y) / 20) ;
+      remy = Math.abs(stickData.y) % 20;
       if (remy > 0 ){
         servo1 = servo1;
         servo2 = servo2;
      }
-
      }
-
-
       // Axiss X
-      if (Math.abs(Joy3.GetX()) <= 20 ){
-
+      if (Math.abs(stickData.x) <= 20 ){
      }else{
-
-      remy = Math.abs(Joy3.GetX()) % 20;
-
-      if (Joy3.GetX() > 20 ){
+      remy = Math.abs(stickData.x) % 20;
+      if (stickData.x > 20 ){
       //servo1x = Math.abs(parseInt(Joy3.GetX() / 20));
-        servo2x = Math.abs(parseInt(Joy3.GetX() / 20));
-
+        servo2x = Math.abs(parseInt(stickData.x/ 20));
         if (remy > 0){
           servo2x = servo2x;
         }
-
          if (servo2 ==0 ){
            servo1x = ( servo2x * step ) * -1;
            servo2x = servo1x;
@@ -347,16 +335,13 @@ setInterval(function(){
          }else{
            servo2x = parseInt(servo2x / 4 * (servo2 * step));
          }
-
         }
-        else if (Joy3.GetX() < -20){
+        else if (stickData.x < -20){
       //servo1x = parseInt(Joy3.GetX() / 20);
-        servo1x = Math.abs(parseInt(Joy3.GetX() / 20));
-
+        servo1x = Math.abs(parseInt(stickData.x / 20));
         if (remy > 0){
           servo1x = servo1x ;
         }
-
          if (servo2 ==0 ){
            servo2x = ( servo1x * step ) * -1;
            servo1x = servo2x;
@@ -365,27 +350,112 @@ setInterval(function(){
            servo1x = parseInt(servo1x / 4 * (servo1 * step));
          }
         }
-
         
       }
-
-
      servox1 = 90 + ( ( servo1 * step)   -  servo1x   )      * mult1  ;
      servox2 = 90 + ( ( servo2 * step)  - servo2x  )   * ( mult2 / -1) ;
+     
+     if (lservo1 != servox1 || lservo2 != servox2) {
+       var xhr = new XMLHttpRequest();
+     xhr.open("GET", "/action?pos1=" + servox1+"&pos2="+servox2, true);
+     xhr.send();
+     
+      lservo1 = servox1;
+      lservo2 = servox2;
+     }
+      
 
+   
+   }
+   
+
+
+
+setInterval(function(){ joy3IinputPosX.value=Joy3.GetPosX(); }, 50);
+setInterval(function(){ joy3InputPosY.value=Joy3.GetPosY(); }, 50);
+setInterval(function(){ joy3Direzione.value=Joy3.GetDir(); }, 50);
+setInterval(function(){ joy3X.value=Joy3.GetX(); }, 50);
+setInterval(function(){ joy3Y.value=Joy3.GetY(); }, 50);
+setInterval(function(){  
+/*
+  
+  var xhr = new XMLHttpRequest();
+     var servo1 = 0;
+     var servo2 = 0;
+     var servox1 = 0;
+     var servox2 = 0;
+     var servo1x = 0;
+     var servo2x = 0;    
+     var step = 3;
+     var mult1 = 1; 
+     var mult2 = 1;
+     
+       
+      if (Joy3.GetY() < 0 ){ 
+        mult1 = -1
+        mult2 = -1;
+      }else{
+        mult1 = 1;
+        mult2 = 1;
+      }
+     // Axiss Y
+     if (Math.abs(Joy3.GetY()) <= 20  ){
+     }else{
+      servo1 = parseInt(Math.abs(Joy3.GetY()) / 20);
+      servo2 = parseInt(Math.abs(Joy3.GetY()) / 20) ;
+      remy = Math.abs(Joy3.GetY()) % 20;
+      if (remy > 0 ){
+        servo1 = servo1;
+        servo2 = servo2;
+     }
+     }
+      // Axiss X
+      if (Math.abs(Joy3.GetX()) <= 20 ){
+     }else{
+      remy = Math.abs(Joy3.GetX()) % 20;
+      if (Joy3.GetX() > 20 ){
+      //servo1x = Math.abs(parseInt(Joy3.GetX() / 20));
+        servo2x = Math.abs(parseInt(Joy3.GetX() / 20));
+        if (remy > 0){
+          servo2x = servo2x;
+        }
+         if (servo2 ==0 ){
+           servo1x = ( servo2x * step ) * -1;
+           servo2x = servo1x;
+           mult2 = mult1 * -1;
+         }else{
+           servo2x = parseInt(servo2x / 4 * (servo2 * step));
+         }
+        }
+        else if (Joy3.GetX() < -20){
+      //servo1x = parseInt(Joy3.GetX() / 20);
+        servo1x = Math.abs(parseInt(Joy3.GetX() / 20));
+        if (remy > 0){
+          servo1x = servo1x ;
+        }
+         if (servo2 ==0 ){
+           servo2x = ( servo1x * step ) * -1;
+           servo1x = servo2x;
+           mult1 =  -1;
+         }else{
+           servo1x = parseInt(servo1x / 4 * (servo1 * step));
+         }
+        }
+        
+      }
+     servox1 = 90 + ( ( servo1 * step)   -  servo1x   )      * mult1  ;
+     servox2 = 90 + ( ( servo2 * step)  - servo2x  )   * ( mult2 / -1) ;
      
      if (lservo1 != servox1 || lservo2 != servox2) {
      xhr.open("GET", "/action?pos1=" + servox1+"&pos2="+servox2, true);
      xhr.send();
      
-
       lservo1 = servox1;
       lservo2 = servox2;
      }
-
       
-     } , 50);
-
+      */
+     } , 100000000);
    }
   </script>
   </body>
