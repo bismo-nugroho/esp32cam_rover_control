@@ -149,6 +149,7 @@ httpd_handle_t camera_httpd = NULL;
 httpd_handle_t stream_httpd = NULL;
 
 static const char PROGMEM INDEX_HTML[] = R"rawliteral(
+
 <html>
   <head>
     <title>ESP32-CAM Robot</title>
@@ -390,12 +391,12 @@ var joy3Y = document.getElementById("joy3Y");
 
 
 
-setInterval(function(){ joy3IinputPosX.value=Joy3.GetPosX(); }, 50);
-setInterval(function(){ joy3InputPosY.value=Joy3.GetPosY(); }, 50);
-setInterval(function(){ joy3Direzione.value=Joy3.GetDir(); }, 50);
-setInterval(function(){ joy3X.value=Joy3.GetX(); }, 50);
-setInterval(function(){ joy3Y.value=Joy3.GetY(); }, 50);
-setInterval(function(){  
+//setInterval(function(){ //joy3IinputPosX.value=Joy3.GetPosX(); }, 50);
+//setInterval(function(){ //joy3InputPosY.value=Joy3.GetPosY(); }, 50);
+//setInterval(function(){ //joy3Direzione.value=Joy3.GetDir(); }, 50);
+//setInterval(function(){ joy3X.value=Joy3.GetX(); }, 50);
+//setInterval(function(){ joy3Y.value=Joy3.GetY(); }, 50);
+//setInterval(function(){  
 /*
   
   var xhr = new XMLHttpRequest();
@@ -474,12 +475,11 @@ setInterval(function(){
      }
       
       */
-     } , 100000000);
+//     } , 100000000);
    }
   </script>
   </body>
 </html>
-
 
 )rawliteral";
 
