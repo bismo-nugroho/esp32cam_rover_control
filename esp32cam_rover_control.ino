@@ -149,7 +149,6 @@ httpd_handle_t camera_httpd = NULL;
 httpd_handle_t stream_httpd = NULL;
 
 static const char PROGMEM INDEX_HTML[] = R"rawliteral(
-
 <html>
   <head>
     <title>ESP32-CAM Robot</title>
@@ -329,6 +328,8 @@ var joy3Y = document.getElementById("joy3Y");
       }
      // Axiss Y
      if (Math.abs(stickData.y) <= 20  ){
+
+     
      }else{
       servo1 = parseInt(Math.abs(stickData.y) / 20);
       servo2 = parseInt(Math.abs(stickData.y) / 20) ;
@@ -348,7 +349,7 @@ var joy3Y = document.getElementById("joy3Y");
         if (remy > 0){
           servo2x = servo2x;
         }
-         if (servo2 ==0 ){
+         if ( Math.abs(stickData.y) <= 20 /* servo2 == 0 */ ){
            servo1x = ( servo2x * step ) * -1;
            servo2x = servo1x;
            mult2 = mult1 * -1;
@@ -356,22 +357,27 @@ var joy3Y = document.getElementById("joy3Y");
            servo2x = parseInt(servo2x / 4 * (servo2 * step));
          }
         }
-        else if (stickData.x < -20){
+        else if (stickData.x <= -20){
+
       //servo1x = parseInt(Joy3.GetX() / 20);
         servo1x = Math.abs(parseInt(stickData.x / 20));
         if (remy > 0){
           servo1x = servo1x ;
         }
-         if (servo2 ==0 ){
+        
+         if (Math.abs(stickData.y) <= 20  /*servo2 ==0  */){
+             //    console.log("less than 20");
            servo2x = ( servo1x * step ) * -1;
            servo1x = servo2x;
-           mult1 =  -1;
+           mult1 =  mult1 * -1;
+          // console.log("servo2x=",servo2x," servo1x",servo1x,"mult=",mult2 );
          }else{
            servo1x = parseInt(servo1x / 4 * (servo1 * step));
          }
         }
         
       }
+      
      servox1 = 90 + ( ( servo1 * step)   -  servo1x   )      * mult1  ;
      servox2 = 90 + ( ( servo2 * step)  - servo2x  )   * ( mult2 / -1) ;
      
