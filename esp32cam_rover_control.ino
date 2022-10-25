@@ -149,7 +149,6 @@ httpd_handle_t camera_httpd = NULL;
 httpd_handle_t stream_httpd = NULL;
 
 static const char PROGMEM INDEX_HTML[] = R"rawliteral(
-
 <html>
   <head>
     <title>ESP32-CAM Robot</title>
@@ -267,7 +266,27 @@ var joy3Param = { "title": "joystick3" };
 var lservo1 = 0;
 var lservo2 = 0;
 
-var Joy3 = new JoyStick('joy3Div', {}, function(stickData) {
+var Joy3 = new JoyStick('joy3Div', 
+{
+    // The ID of canvas element
+    title: 'joystick',
+    // width/height
+    width: undefined,
+    height: undefined,
+    // Internal color of Stick
+    internalFillColor: '#00AA00',
+    // Border width of Stick
+    internalLineWidth: 2,
+    // Border color of Stick
+    internalStrokeColor: '#003300',
+    // External reference circonference width
+    externalLineWidth: 2,
+    //External reference circonference color
+    externalStrokeColor: '#008000',
+    // Sets the behavior of the stick
+    autoReturnToCenter: true
+    
+}, function(stickData) {
     joy3PosizioneX.value = stickData.xPosition;
     joy3PosizioneX.value = stickData.yPosition;
     joy3Direzione.value = stickData.cardinalDirection;
