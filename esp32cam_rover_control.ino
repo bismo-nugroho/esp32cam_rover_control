@@ -133,6 +133,19 @@ const char* password = "pisanggoreng";
 
 #define SERVO_STEP   5
 
+
+//
+// LED Illuminator
+//
+#define CONFIG_LED_ILLUMINATOR_ENABLED
+#define CONFIG_LED_LEDC_PIN 4
+#define CONFIG_LED_MAX_INTENSITY 255
+//#define CONFIG_LED_LEDC_LOW_SPEED_MODE
+// CONFIG_LED_LEDC_HIGH_SPEED_MODE is not set
+#define CONFIG_LED_LEDC_TIMER LEDC_TIMER_0
+#define CONFIG_LED_LEDC_CHANNEL LEDC_CHANNEL_0
+// end of LED Illuminator
+
 Servo servoN1;
 Servo servoN2;
 Servo servo1;
@@ -736,6 +749,21 @@ void setup() {
     config.jpeg_quality = 12;
     config.fb_count = 1;
   }
+  
+config.frame_size = FRAMESIZE_SVGA;
+config.pixel_format = PIXFORMAT_JPEG; // for streaming
+//config.pixel_format = PIXFORMAT_RGB565; // for face detection/recognition
+config.grab_mode = CAMERA_GRAB_WHEN_EMPTY;
+//config.fb_location = CAMERA_FB_IN_PSRAM;
+//config.jpeg_quality = 12;
+//config.fb_count = 1;
+  
+  
+const int pwmfreq = 50000;     // 50K pwm frequency
+const int pwmresolution = 9;   // duty cycle bit range
+ledcSetup(config.ledc_channel, pwmfreq, pwmresolution);  // configure LED PWM channel
+ledcAttachPin(4, config.ledc_channel);            // attach the GPIO pin to the channel
+
   
   // Camera init
   esp_err_t err = esp_camera_init(&config);
