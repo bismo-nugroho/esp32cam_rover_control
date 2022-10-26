@@ -11,7 +11,6 @@ Servo servo1;
 Servo servo2;
 
 
-
 #define PART_BOUNDARY "123456789000000000000987654321"
 
 int servo1Pos = 90;

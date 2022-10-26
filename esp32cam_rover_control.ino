@@ -129,8 +129,6 @@ const char* password = "pisanggoreng";
 #endif
 
 
-
-
 //
 // LED Illuminator
 //
